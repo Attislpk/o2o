@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+<!--1.jdbc配置-->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+<!--2.数据库连接池-->
+        <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+            <property name="driverClassName" value="${jdbc.driver}"/>
+            <property name="url" value="${jdbc.url}"/>
+            <property name="username" value="${jdbc.username}"/>
+            <property name="password" value="${jdbc.password}"/>
+            
+<!--配置数据库连接池的私有属性-->
+            <property name="initialSize" value="15"/>
+            <property name="maxActive" value="30"/>
+            <property name="minIdle" value="10"/>
+
+            <property name="defaultAutoCommit" value="false"/>
+            <property name="maxWait" value="1000"/>
+            <property name="connectionErrorRetryAttempts" value="2"/>
+        </bean>
+
+<!--3.配置sqlSessionFactory-->
+    <bean name="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+        <property name="typeAliasesPackage" value="com.imooc.o2o.entity"/>
+    </bean>
+
+<!--4.扫描dao包，将接口的实现类动态的注入到Spring容器中-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.imooc.o2o.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+</beans>
+
+
+
+
+<!--
+<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+　　<property name="url" value="${jdbc.url}" />
+　　<property name="username" value="${jdbc.username}" />
+　　<property name="password" value="${jdbc.password}" />
+　　<property name="driverClassName" value="${jdbc.driver}" />
+　　<property name="maxActive" value="10" />
+　　<property name="minIdle" value="5" />
+</bean>
+
+-->

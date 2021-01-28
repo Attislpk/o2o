@@ -1,0 +1,7 @@
+*.class
+*.jar
+*.iml
+*.war
+*.idea
+*.out
+jdbc.properties

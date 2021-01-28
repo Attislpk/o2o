@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.imooc.o2o.dao.ShopDao">
+    <!--
+    useGeneratedKeys="true"  使用自增主键, 无需手动输入
+    keyColumn="shop_id"   数据库中的shop_id
+    keyProperty="shopId"  Shop类中的shopId属性
+
+    #{对象.属性} 引入的对象
+    #{属性} 本身
+    -->
+    <insert id="insertShop" useGeneratedKeys="true" keyColumn="shop_id" keyProperty="shopId">
+        INSERT INTO tb_shop(owner_id, area_id, shop_category_id, shop_name, shop_desc, shop_addr, phone, shop_img,
+            priority, create_time, last_edit_time, status, advice)
+        VALUES (#{owner.userId}, #{area.areaId}, #{shopCategory.shopCategoryId}, #{shopName},
+                #{shopDesc}, #{shopAddr}, #{phone}, #{shopImg}, #{priority}, #{createTime}, #{lastEditTime},
+                #{status}, #{advice})
+    </insert>
+
+<!-- 使用动态SQL对数据库进行更新操作, shopId, ownerId, createTime不可变-->
+    <update id="updateShop">
+        UPDATE tb_shop
+        <set>
+            <if test="area!=null">area_id=#{area.areaId},</if>
+            <if test="shopCategory!=null">shop_category_id=#{shopCategory.shopCategoryId},</if>
+            <if test="shopName!=null">shop_name=#{shopName},</if>
+            <if test="shopDesc!=null">shop_desc=#{shopDesc},</if>
+            <if test="shopAddr!=null">shop_addr=#{shopAddr},</if>
+            <if test="phone!=null">phone=#{phone},</if>
+            <if test="shopImg!=null">shop_img=#{shopImg},</if>
+            <if test="priority!=null">priority=#{priority},</if>
+            <if test="lastEditTime!=null">last_edit_time=#{lastEditTime},</if>
+            <if test="status!=null">status=#{status},</if>
+            <if test="advice!=null">advice=#{advice}</if>
+        </set>
+        WHERE shop_id=#{shopId}
+    </update>
+</mapper>
