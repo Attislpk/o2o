@@ -12,4 +12,9 @@
         <!--        采用别名替换列名: 默认开启-->
         <setting name="useColumnLabel" value="true"/>
     </settings>
+
+<!--    设置拦截器-->
+    <plugins>
+        <plugin interceptor="com.imooc.o2o.dao.split.DynamicDataSourceInterceptor"></plugin>
+    </plugins>
 </configuration>

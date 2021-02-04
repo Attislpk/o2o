@@ -1,6 +1,7 @@
 package com.imooc.o2o.dao;
 
 import com.imooc.o2o.entity.Shop;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 对shop进行操作的接口

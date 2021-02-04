@@ -10,9 +10,9 @@
 
 <!-- 控制台设置-->
     <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
-        <encoding>
+        <encoder>
             <pattern>${log.pattern}</pattern>
-        </encoding>
+        </encoder>
     </appender>
 
 <!-- DEBUG-->

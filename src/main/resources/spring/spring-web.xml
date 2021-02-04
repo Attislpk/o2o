@@ -16,15 +16,24 @@
     Use of this handler allows using a "/" mapping with the DispatcherServlet
     while still utilizing the Servlet container to serve static resources.
 -->
+    <mvc:resources mapping="/resources/**" location="/resources/"/>
     <mvc:default-servlet-handler/>
 
 <!--3.配置视图解析器-->
-    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
         <property name="prefix" value="/WEB-INF/html/"/>
         <property name="suffix" value=".html"/>
     </bean>
 
+<!--   配置文件上传解析器: 解析上传的文件、验证码-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="utf-8"/>
+        <!-- 20M = 1024 * 1024 * 20-->
+        <property name="maxUploadSize" value="20971520"/>
+        <property name="maxInMemorySize" value="20971520"/>
+    </bean>
+
 <!--4. 注解扫描-->
-    <context:component-scan base-package="com.imooc.o2o.web.superadmin"/>
+    <context:component-scan base-package="com.imooc.o2o.web"/>
 </beans>

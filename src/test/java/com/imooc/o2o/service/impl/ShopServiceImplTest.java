@@ -16,6 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Date;
 
 public class ShopServiceImplTest extends BaseTest {
@@ -24,7 +27,7 @@ public class ShopServiceImplTest extends BaseTest {
     private ShopService shopService;
 
     @Test
-    public void testAddShop() {
+    public void testAddShop() throws FileNotFoundException {
         Area area = new Area();
         area.setAreaId(2);
 
@@ -38,8 +41,8 @@ public class ShopServiceImplTest extends BaseTest {
                 "serviceTest",1,new Date(),new Date(), ShopStateEnum.CHECK.getState(),"审核中",area,owner,shopCategory);
 
         File shopImg = new File("C:/Users/1/Desktop/car.jpg");
-
-        ShopExecution shopExecution = shopService.addShop(shop, shopImg);
+        InputStream shopImgInputStream = new FileInputStream(shopImg); //此处确保文件路径存在，因此直接将异常抛出不需要进行try-catch处理
+        ShopExecution shopExecution = shopService.addShop(shop, shopImgInputStream, shopImg.getName());
         System.out.println(shopExecution);
 
     }

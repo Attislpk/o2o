@@ -17,7 +17,6 @@ public class ShopDaoTest extends BaseTest {
     private ShopDao shopDao;
 
     @Test
-    @Ignore
     public void testInsertShop() {
         Area area = new Area();
         area.setAreaId(2);
@@ -35,6 +34,7 @@ public class ShopDaoTest extends BaseTest {
     }
 
     @Test
+    @Ignore
     public void testUpdateShop(){
         Shop shop = new Shop();
         shop.setShopId(1L);

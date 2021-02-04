@@ -8,16 +8,14 @@ import com.imooc.o2o.exception.ShopOperationException;
 import com.imooc.o2o.service.ShopService;
 import com.imooc.o2o.util.ImageUtil;
 import com.imooc.o2o.util.PathUtil;
-import com.mysql.cj.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import java.io.File;
-import java.io.Serializable;
+import java.io.InputStream;
 import java.util.Date;
 @Service
 public class ShopServiceImpl implements ShopService{
@@ -29,7 +27,7 @@ public class ShopServiceImpl implements ShopService{
     //添加shop需要保证shop表中数据的插入和img的插入是同时完成的，出现运行时异常则需要回滚    添加店铺信息+添加图片信息+更新图片信息
     @Transactional
     @Override
-    public ShopExecution addShop(Shop shop, File shopImg) {
+    public ShopExecution addShop(Shop shop, InputStream shopImgInputStream, String fileName) {
         //空值判断
         if (shop == null){
             //返回执行失败的shopExecution
@@ -47,13 +45,13 @@ public class ShopServiceImpl implements ShopService{
             if (effectNum <= 0){
                 throw new ShopOperationException("add shop error!");
             }else {
-                if (shopImg!=null){
+                if (shopImgInputStream !=null){
                     //存储图片
                     try {
                         //将shop和shopImg绑定起来, 可能抛出异常
-                        addShopImg(shop,shopImg);
+                        addShopImg(shop, shopImgInputStream, fileName);
                     }catch (Exception e){
-                        throw new ShopOperationException("add shopImg error:"+e.getMessage());
+                        throw new ShopOperationException("add shopImgInputStream error:"+e.getMessage());
                     }
                     //更新店铺的图片地址, 上述try块中已经完成了shop和img的图片绑定，此处进行更新
                     effectNum = shopDao.updateShop(shop);
@@ -71,14 +69,14 @@ public class ShopServiceImpl implements ShopService{
     /**
      * 将shop对象和shopImg进行绑定
      * @param shop shop对象
-     * @param shopImg shopImg，图片存放的地址
+     * @param  shopImgInputStream，图片输入流
      */
-    private void addShopImg(Shop shop, File shopImg) {
+    private void addShopImg(Shop shop, InputStream shopImgInputStream, String fileName) {
         //img的目标路径
         String destPath = PathUtil.getShopImagePath(shop.getShopId()); //"/upload/item/shop/"+shopId+"/"
         //获取img的相对路径
         logger.debug("destPath:"+destPath);
-        String shopImgAddr = ImageUtil.generateThumbnail(shopImg,destPath); //destPath + realFileName + extension;
+        String shopImgAddr = ImageUtil.generateThumbnail(shopImgInputStream,destPath,fileName); //destPath + realFileName + extension;
         //设置shop图片的相对路径
         shop.setShopImg(shopImgAddr); //相对路径+imgname.jpg
     }

@@ -11,6 +11,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
@@ -31,11 +32,11 @@ public class ImageUtil {
      * @param targetAddr 目标地址
      * @return 缩略图的相对路径
      */
-    public static String generateThumbnail(File thumbnail, String targetAddr) {
+    public static String generateThumbnail(InputStream thumbnailInputStream, String targetAddr, String fileName) {
         //缩略图名
         String realFileName = getRandomFileName();
         //缩略图拓展名
-        String extension = getFileExtension(thumbnail);
+        String extension = getFileExtension(fileName);
         //缩略图路径
         makeDirPath(targetAddr);
         //缩略图存放的相对路径
@@ -45,7 +46,7 @@ public class ImageUtil {
         File absoFile = new File(PathUtil.getImgBasePath() + relativeAddr);
         logger.debug("curren complete addr is :" + absoFile.getPath());
         try {
-            Thumbnails.of(thumbnail).size(200, 200).watermark(Positions.BOTTOM_RIGHT,
+            Thumbnails.of(thumbnailInputStream).size(200, 200).watermark(Positions.BOTTOM_RIGHT,
                     ImageIO.read(new File(basePath + "watermark.jpg")), 0.5f).outputQuality(0.8f).
                     toFile(absoFile);
         } catch (IOException e) {
@@ -58,12 +59,11 @@ public class ImageUtil {
     /**
      * 获取输入文件流拓展名
      *
-     * @param cFile 输入文件流
+     * @param fileName 输入文件名
      * @return 文件拓展名
      */
-    private static String getFileExtension(File cFile) {
-        String originalFilename = cFile.getName();
-        return originalFilename.substring(originalFilename.lastIndexOf("."));
+    public static String getFileExtension(String fileName) {
+        return fileName.substring(fileName.lastIndexOf("."));
     }
 
     /**
@@ -71,7 +71,7 @@ public class ImageUtil {
      *
      * @return 随机文件名
      */
-    private static String getRandomFileName() {
+    public static String getRandomFileName() {
         String nowTimestr = sDateFormat.format(new Date());
         int rand = random.nextInt(89999) + 10000;
         return nowTimestr + rand;
@@ -83,7 +83,7 @@ public class ImageUtil {
      * @param targetAddr 目标路径
      *                   例如E:/JAVACODE/projectdev/image/ 则会创建projectdev,image两个文件夹
      */
-    private static void makeDirPath(String targetAddr) {
+    public static void makeDirPath(String targetAddr) {
         //绝对路径=根路径+相对路径, 创建目录
         String realFileParentPath = PathUtil.getImgBasePath() + targetAddr;
         File dirPath = new File(realFileParentPath);
