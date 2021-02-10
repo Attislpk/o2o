@@ -28,7 +28,7 @@ public class ImageUtil {
 
     /**
      * 创建图片缩略图
-     * @param thumbnail 图片输入流
+     * @param thumbnailInputStream 图片输入流
      * @param targetAddr 目标地址
      * @return 缩略图的相对路径
      */
@@ -106,5 +106,23 @@ public class ImageUtil {
             e.printStackTrace();
         }
         return newFile;
+    }
+
+    /**
+     * 删除文件/删除目录下的文件并删除目录
+     * @param storePath
+     */
+    public static void deletePath(String storePath){
+        File fileOrDir = new File(PathUtil.getImgBasePath() + storePath);//根路径+相对路径
+        if (fileOrDir.exists()){
+            if (fileOrDir.isDirectory()){
+                File[] files = fileOrDir.listFiles();
+                for (int i = 0; i < files.length; i++){
+                    files[i].delete();
+                }
+            }
+            //如果是文件或者已经删除完毕目录下的全部文件，则删除该文件or空目录
+            fileOrDir.delete();
+        }
     }
 }

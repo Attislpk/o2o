@@ -18,6 +18,7 @@ public class Product {
     private Integer priority;
     private Date createTime;
     private Date lastEditTime;
+    //0-下架，1-在前端系统展示
     private Integer status;
 
     private List<ProductImg> productImgList;

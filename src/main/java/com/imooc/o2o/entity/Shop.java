@@ -3,12 +3,14 @@ package com.imooc.o2o.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class Shop {
     private Long shopId;
     private String shopName;

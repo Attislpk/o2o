@@ -15,4 +15,23 @@ public class ShopAdminController {
     public String shopOperation(){
         return "/shop/shopoperation"; //  /WEB-INF/html/shop/shopoperation.html
     }
+
+    //访问shoplist.html
+    @RequestMapping(value = "/shoplist", method = RequestMethod.GET)
+    public String getShopList(){
+        return "/shop/shoplist";
+    }
+
+    //访问shopmanagement.html
+    @RequestMapping(value = "/shopmanagement", method = RequestMethod.GET)
+    public String shopManagement(){
+        return "/shop/shopmanagement";
+    }
+
+    //访问productcategorymanagement.html
+    @RequestMapping(value = "/productcategorymanagement", method = RequestMethod.GET)
+    public String productCategoryManagement(){
+        return "/shop/productcategorymanagement";
+    }
+
 }

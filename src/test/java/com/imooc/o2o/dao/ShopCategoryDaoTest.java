@@ -18,7 +18,7 @@ public class ShopCategoryDaoTest extends BaseTest {
     @Test
     public void testQuerySubshopCategory() {
         //无where条件
-        List<ShopCategory> shopCategories = shopCategoryDao.QuerySubshopCategory(new ShopCategory());
+        List<ShopCategory> shopCategories = shopCategoryDao.querySubshopCategory(new ShopCategory());
         for (ShopCategory shopCategory : shopCategories) {
             System.out.println(shopCategory);
         }
@@ -33,7 +33,7 @@ public class ShopCategoryDaoTest extends BaseTest {
         testShopCategory.setParent(parentShopCategory);
 
         //查找testShopCategory的父类parentShopCategory下的所有子类
-        List<ShopCategory> shopCategories = shopCategoryDao.QuerySubshopCategory(testShopCategory);
+        List<ShopCategory> shopCategories = shopCategoryDao.querySubshopCategory(testShopCategory);
         for (ShopCategory shopCategory : shopCategories) {
             System.out.println(shopCategory);
         }

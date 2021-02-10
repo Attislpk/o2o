@@ -2,14 +2,22 @@ package com.imooc.o2o.dto;
 
 import com.imooc.o2o.entity.Shop;
 import com.imooc.o2o.enums.ShopStateEnum;
+import lombok.ToString;
+import org.apache.ibatis.javassist.SerialVersionUID;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * 执行店铺相关操作后的结果
  */
-public class ShopExecution {
+@ToString
+public class ShopExecution implements Serializable {
 
+
+    @Serial
+    private static final long serialVersionUID = 9187975477625285126L;
     //结果状态
     private int state;
 
@@ -86,14 +94,4 @@ public class ShopExecution {
         this.shopList = shopList;
     }
 
-    @Override
-    public String toString() {
-        return "ShopExecution{" +
-                "state=" + state +
-                ", stateInfo='" + stateInfo + '\'' +
-                ", count=" + count +
-                ", shop=" + shop +
-                ", shopList=" + shopList +
-                '}';
-    }
 }
