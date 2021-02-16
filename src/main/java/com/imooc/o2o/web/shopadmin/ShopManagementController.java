@@ -1,6 +1,7 @@
 package com.imooc.o2o.web.shopadmin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.imooc.o2o.dto.ImageHolder;
 import com.imooc.o2o.dto.ShopExecution;
 import com.imooc.o2o.entity.Area;
 import com.imooc.o2o.entity.PersonInfo;
@@ -16,8 +17,6 @@ import com.imooc.o2o.util.HttpServletRequestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,7 +26,6 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
-import java.rmi.MarshalledObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +34,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/shopadmin")
 public class ShopManagementController {
-    private Logger logger = LoggerFactory.getLogger(ProductCategoryManagementController.class);
+    private final Logger logger = LoggerFactory.getLogger(ProductCategoryManagementController.class);
 
     @Autowired
     private ShopService shopService;
@@ -126,9 +124,9 @@ public class ShopManagementController {
 
 
     @RequestMapping(value = "/registershop", method = RequestMethod.POST)
-    private Map<String, Object> registerShop(HttpServletRequest httpServletRequest) {
+    private Map<String, Object> registerShop(HttpServletRequest httpServletRequest) throws IOException {
         //验证码比对, 并封装对象
-        Map<String, Object> modelMap = codeVerify(httpServletRequest);
+        Map<String, Object> modelMap = CodeUtil.codeVerify(httpServletRequest);
 
         //1.接受从前端传来的相关参数并转换成对应的POJO对象
         String shopStr = HttpServletRequestUtil.getString(httpServletRequest, "shopStr");
@@ -161,8 +159,9 @@ public class ShopManagementController {
             PersonInfo owner = (PersonInfo) httpServletRequest.getSession().getAttribute("user");
             shop.setOwner(owner);
             ShopExecution shopExecution;
+            ImageHolder imageHolder = new ImageHolder(shopImg.getOriginalFilename(),shopImg.getInputStream());
             try {
-                shopExecution = shopService.addShop(shop, shopImg.getInputStream(), shopImg.getOriginalFilename());
+                shopExecution = shopService.addShop(shop,imageHolder);
                 if (shopExecution.getState() == ShopStateEnum.CHECK.getState()) {
                     modelMap.put("success", true);
                     //店铺和用户的关系是多对一，因此ssesion中还需要存储该用户相关的店铺信息  当店铺添加成功后:
@@ -180,9 +179,6 @@ public class ShopManagementController {
                 }
 
             } catch (ShopOperationException e) {
-                modelMap.put("success", false);
-                modelMap.put("errMsg", e.toString());
-            } catch (IOException e) {
                 modelMap.put("success", false);
                 modelMap.put("errMsg", e.toString());
             }
@@ -219,8 +215,8 @@ public class ShopManagementController {
     }
 
     @RequestMapping(value = "/modifyshop", method = RequestMethod.POST)
-    private Map<String, Object> modifyshop(HttpServletRequest httpServletRequest) {
-        Map<String, Object> modelMap = codeVerify(httpServletRequest);
+    private Map<String, Object> modifyshop(HttpServletRequest httpServletRequest) throws IOException {
+        Map<String, Object> modelMap = CodeUtil.codeVerify(httpServletRequest);
 
         //1.接受从前端传来的相关参数并转换成对应的POJO对象
         String shopStr = HttpServletRequestUtil.getString(httpServletRequest, "shopStr");
@@ -247,11 +243,12 @@ public class ShopManagementController {
         //2.修改店铺信息
         if (shop != null && shop.getShopId() != null) {
             ShopExecution shopExecution;
+            ImageHolder imageHolder = new ImageHolder(shopImg.getOriginalFilename(),shopImg.getInputStream());
             try {
                 if (shopImg == null){
-                    shopExecution = shopService.modifyShop(shop,null,null);
+                    shopExecution = shopService.modifyShop(shop,null);
                 }else {
-                    shopExecution = shopService.modifyShop(shop, shopImg.getInputStream(), shopImg.getOriginalFilename());
+                    shopExecution = shopService.modifyShop(shop, imageHolder);
                 }
                 if (shopExecution.getState() == ShopStateEnum.SUCCESS.getState()) {
                     modelMap.put("success", true);
@@ -260,9 +257,6 @@ public class ShopManagementController {
                     modelMap.put("errMsg", "请输入店铺id");
                 }
             } catch (ShopOperationException e) {
-                modelMap.put("success", false);
-                modelMap.put("errMsg", e.toString());
-            } catch (IOException e) {
                 modelMap.put("success", false);
                 modelMap.put("errMsg", e.toString());
             }
@@ -275,16 +269,7 @@ public class ShopManagementController {
         }
     }
 
-    //验证码比对方法
-    private static Map<String, Object> codeVerify(HttpServletRequest httpServletRequest){
-        Map<String, Object> modelMap = new HashMap<>();
-        //验证码比对
-        if (!CodeUtil.checkVerifyCode(httpServletRequest)) {
-            modelMap.put("success", false);
-            modelMap.put("errMsg", "验证码输入错误");
-        }
-        return modelMap;
-    }
+
 
     //将CommonsMultipartFile转换为File的辅助方法  CommonsMultipartFile implements MultipartFile, Serializable
     private static void inputStreamToFile(InputStream ins, File file) {

@@ -3,6 +3,7 @@ package com.imooc.o2o.service.impl;
 import com.fasterxml.jackson.databind.ser.Serializers;
 import com.imooc.o2o.BaseTest;
 import com.imooc.o2o.dao.ShopDao;
+import com.imooc.o2o.dto.ImageHolder;
 import com.imooc.o2o.dto.ShopExecution;
 import com.imooc.o2o.entity.Area;
 import com.imooc.o2o.entity.PersonInfo;
@@ -57,7 +58,8 @@ public class ShopServiceImplTest extends BaseTest {
 
         File shopImg = new File("C:/Users/1/Desktop/car.jpg");
         InputStream shopImgInputStream = new FileInputStream(shopImg); //此处确保文件路径存在，因此直接将异常抛出不需要进行try-catch处理
-        ShopExecution shopExecution = shopService.addShop(shop, shopImgInputStream, shopImg.getName());
+        ImageHolder imageHolder = new ImageHolder(shopImg.getName(),shopImgInputStream);
+        ShopExecution shopExecution = shopService.addShop(shop,imageHolder);
         System.out.println(shopExecution);
     }
 
@@ -68,7 +70,8 @@ public class ShopServiceImplTest extends BaseTest {
         shop.setShopName("修改后的店铺名称");
         File shopImg = new File("C:/Users/1/Desktop/QQ.jpg");
         InputStream is = new FileInputStream(shopImg);
-        ShopExecution shopExecution = shopService.modifyShop(shop, is, "QQ.jpg");
+        ImageHolder imageHolder = new ImageHolder("QQ.jpg",is);
+        ShopExecution shopExecution = shopService.modifyShop(shop, imageHolder);
         System.out.println(shopExecution);
     }
 }

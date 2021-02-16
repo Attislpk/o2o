@@ -1,5 +1,6 @@
 package com.imooc.o2o.service;
 
+import com.imooc.o2o.dto.ImageHolder;
 import com.imooc.o2o.dto.ShopExecution;
 import com.imooc.o2o.entity.Shop;
 import com.imooc.o2o.exception.ShopOperationException;
@@ -37,11 +38,11 @@ public interface ShopService {
      * @return shopExecution对象，携带shop以及相关的操作状态信息
      * 修改店铺涉及事务处理，需要抛出运行时异常
      */
-    ShopExecution modifyShop(Shop shop,InputStream shopImgInputStream, String fileName) throws ShopOperationException;
+    ShopExecution modifyShop(Shop shop, ImageHolder thumbnail) throws ShopOperationException;
 
     //传入InputStrem而不是file，可以降低commonsMultipartFile和file相互转换导致的异常，inputstream只包括文件信息
     // 无法携带文件名，因此要单独传入   添加店铺涉及事务处理，需要抛出运行时异常
-    ShopExecution addShop(Shop shop, InputStream shopImgInputStream, String fileName) throws ShopOperationException;
+    ShopExecution addShop(Shop shop, ImageHolder thumbnail) throws ShopOperationException;
 
 }
 

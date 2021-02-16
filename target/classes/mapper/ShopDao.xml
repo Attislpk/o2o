@@ -17,7 +17,6 @@
         <result column="last_edit_time" property="lastEditTime"/>
         <result column="status" property="status"/>
         <result column="advice" property="advice"/>
-
         <association column="area_id" property="area" javaType="com.imooc.o2o.entity.Area">
             <id column="area_id" property="areaId"/>
             <result column="area_name" property="areaName"/>

@@ -1,6 +1,7 @@
 package com.imooc.o2o.service.impl;
 
 import com.imooc.o2o.dao.ShopDao;
+import com.imooc.o2o.dto.ImageHolder;
 import com.imooc.o2o.dto.ShopExecution;
 import com.imooc.o2o.entity.Shop;
 import com.imooc.o2o.enums.ShopStateEnum;
@@ -50,20 +51,18 @@ public class ShopServiceImpl implements ShopService{
     /**
      *
      * @param shop 新的shop对象，携带需要修改的shop信息
-     * @param shopImgInputStream 图片输入流
-     * @param fileName 文件名
      * @return
      * @throws ShopOperationException
      */
     @Override
     @Transactional
-    public ShopExecution modifyShop(Shop shop, InputStream shopImgInputStream, String fileName) throws ShopOperationException{
+    public ShopExecution modifyShop(Shop shop, ImageHolder thumbnail) throws ShopOperationException{
        if (shop == null || shop.getShopId() == null){
            return new ShopExecution(ShopStateEnum.NULL_SHOPID);
        }else {
            try {
                //1.判断是否需要处理图片
-               if (shopImgInputStream != null && fileName != null && !"".equals(fileName)){
+               if (thumbnail.getImageInputStream() != null && thumbnail.getImageName() != null && !"".equals(thumbnail.getImageName())){
                    //确保每次获取的shop信息都是最新的  oldShop是原shop
                    Shop oldShop = shopDao.queryByShopId(shop.getShopId());
                    if (oldShop.getShopImg() != null){
@@ -71,7 +70,7 @@ public class ShopServiceImpl implements ShopService{
                    }
                }
                //更新shop的图片信息
-               addShopImg(shop,shopImgInputStream,fileName);
+               addShopImg(shop,thumbnail);
 
                //2.更新店铺其他信息
                shop.setLastEditTime(new Date());
@@ -92,7 +91,7 @@ public class ShopServiceImpl implements ShopService{
     //添加shop需要保证shop表中数据的插入和img的插入是同时完成的，出现运行时异常则需要回滚    添加店铺信息+添加图片信息+更新图片信息
     @Transactional
     @Override
-    public ShopExecution addShop(Shop shop, InputStream shopImgInputStream, String fileName) throws ShopOperationException{
+    public ShopExecution addShop(Shop shop, ImageHolder thumbnail) throws ShopOperationException{
         //空值判断
         if (shop == null){
             //返回执行失败的shopExecution
@@ -110,11 +109,11 @@ public class ShopServiceImpl implements ShopService{
             if (effectNum <= 0){
                 throw new ShopOperationException("add shop error!");
             }else {
-                if (shopImgInputStream !=null){
+                if (thumbnail.getImageInputStream() !=null){
                     //存储图片
                     try {
                         //将shop和shopImg绑定起来, 可能抛出异常
-                        addShopImg(shop, shopImgInputStream, fileName);
+                        addShopImg(shop, thumbnail);
                     }catch (Exception e){
                         throw new ShopOperationException("add shopImgInputStream error:"+e.getMessage());
                     }
@@ -134,15 +133,19 @@ public class ShopServiceImpl implements ShopService{
     /**
      * 将shop对象和shopImg进行绑定
      * @param shop shop对象
-     * @param  shopImgInputStream，图片输入流
+     * @param  thumbnail inputStream+filename
      */
-    private void addShopImg(Shop shop, InputStream shopImgInputStream, String fileName) {
+    private void addShopImg(Shop shop, ImageHolder thumbnail) {
         //img的目标路径
         String destPath = PathUtil.getShopImagePath(shop.getShopId()); //"/upload/item/shop/"+shopId+"/"
         //获取img的相对路径
         logger.debug("destPath:"+destPath);
-        String shopImgAddr = ImageUtil.generateThumbnail(shopImgInputStream,destPath,fileName); //destPath + realFileName + extension;
+        String shopImgAddr = ImageUtil.generateThumbnail(thumbnail,destPath); //destPath + realFileName + extension;
         //设置shop图片的相对路径
         shop.setShopImg(shopImgAddr); //相对路径+imgname.jpg
     }
+
+
+
+
 }

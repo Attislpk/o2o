@@ -1,9 +1,8 @@
 package com.imooc.o2o.util;
 
+import com.imooc.o2o.dto.ImageHolder;
 import net.coobird.thumbnailator.Thumbnails;
-import net.coobird.thumbnailator.geometry.Position;
 import net.coobird.thumbnailator.geometry.Positions;
-import net.coobird.thumbnailator.util.ThumbnailatorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
@@ -11,7 +10,6 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
@@ -28,15 +26,15 @@ public class ImageUtil {
 
     /**
      * 创建图片缩略图
-     * @param thumbnailInputStream 图片输入流
+     * @param imageHolder 图片输入流+name
      * @param targetAddr 目标地址
      * @return 缩略图的相对路径
      */
-    public static String generateThumbnail(InputStream thumbnailInputStream, String targetAddr, String fileName) {
+    public static String generateThumbnail(ImageHolder imageHolder, String targetAddr) {
         //缩略图名
         String realFileName = getRandomFileName();
         //缩略图拓展名
-        String extension = getFileExtension(fileName);
+        String extension = getFileExtension(imageHolder.getImageName());
         //缩略图路径
         makeDirPath(targetAddr);
         //缩略图存放的相对路径
@@ -46,7 +44,7 @@ public class ImageUtil {
         File absoFile = new File(PathUtil.getImgBasePath() + relativeAddr);
         logger.debug("curren complete addr is :" + absoFile.getPath());
         try {
-            Thumbnails.of(thumbnailInputStream).size(200, 200).watermark(Positions.BOTTOM_RIGHT,
+            Thumbnails.of(imageHolder.getImageInputStream()).size(200, 200).watermark(Positions.BOTTOM_RIGHT,
                     ImageIO.read(new File(basePath + "watermark.jpg")), 0.5f).outputQuality(0.8f).
                     toFile(absoFile);
         } catch (IOException e) {
@@ -125,4 +123,35 @@ public class ImageUtil {
             fileOrDir.delete();
         }
     }
+
+    /**
+     * 传入一个ImageHolder对象和目标地址，在该地址下生成一个带水印的标准图
+     * @param productImgHolder
+     * @param targetAddr
+     * @return
+     */
+    public static String generateNormalImg(ImageHolder productImgHolder, String targetAddr) {
+        //正常图名
+        String realFileName = getRandomFileName();
+        //正常图拓展名
+        String extension = getFileExtension(productImgHolder.getImageName());
+        //正常图名路径
+        makeDirPath(targetAddr);
+        //缩略图存放的相对路径
+        String relativeAddr = targetAddr + realFileName + extension;
+        logger.debug("current relativeAddr is :" + relativeAddr);
+        //文件绝对路径   "E:/JAVACODE/projectdev/image/" + targetAddr + realFileName + extension;
+        File absoFile = new File(PathUtil.getImgBasePath() + relativeAddr);
+        logger.debug("curren complete addr is :" + absoFile.getPath());
+        try {
+            Thumbnails.of(productImgHolder.getImageInputStream()).size(367, 400).watermark(Positions.BOTTOM_RIGHT,
+                    ImageIO.read(new File(basePath + "watermark.jpg")), 0.9f).outputQuality(0.8f).
+                    toFile(absoFile);
+        } catch (IOException e) {
+            logger.error(e.toString());
+            throw new RuntimeException("标准图创建失败" + e.toString());
+        }
+        return relativeAddr;
+    }
+
 }
